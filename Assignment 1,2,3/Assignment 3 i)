@@ -1,0 +1,50 @@
+#include<stdio.h>
+#include<unistd.h>
+#include<fcntl.h>
+#include<string.h>
+#define BLOCKSIZE 1024
+
+int main(int argc, char *argv[])
+{
+
+    int fdSource=0;
+    int fdDest=0;
+    int Ret=0;
+
+    char Buffer[BLOCKSIZE]={'\0'};
+
+    if(argc!=3)
+    {
+        printf("Invalid Arguments \n");
+        return -1;
+    }
+
+    fdSource= open(argv[1],O_RDONLY);
+
+    if(fdSource==-1)
+    {
+        printf("Unable to open the Source File");
+        return -1;
+    }
+
+    fdDest=creat(argv[2],0777);
+
+    if(fdDest==-1)
+    {
+        printf("Unable to create the Destination File \n");
+        close(fdSource);
+        //If file is not created, then close the source file
+        return -1;
+    }
+
+    while((Ret = read(fdSource,Buffer,sizeof(Buffer)))!=0)
+    {
+        write(fdDest,Buffer,Ret);
+        memset(Buffer,0,sizeof(Buffer));//clear the Buffer after usage
+    }
+
+    close(fdSource);
+    close(fdDest);
+    
+    return 0;
+}
